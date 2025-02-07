@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+import dj_database_url
+from .settings import * 
+from .settings import BASE_DIR
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +30,11 @@ SECRET_KEY = 'django-insecure-$!l+uqyhjvf6^r2q#lsde2jycge49@+_n%z%*k2bq@=qbd&^$t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.86.32', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME')]
+CSRF_TRUSTED_ORIGINS = ['https://'+os.environ.get('RENDER_EXTERNAL_HOSTNAME')]
+
+DEBUG = False
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8081",
@@ -91,16 +98,11 @@ ASGI_APPLICATION = 'Project.asgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'SocialMediaDB',
-        'USER' : 'postgres',
-        'PASSWORD' : 'sarthak@psql',
-        'HOST' : 'localhost',
-        'PORT' : '5432',
+    'default': dj_database_url.config(
+        default= os.environ['DATABASE_URL'], 
+        conn_max_age=600
+    )
 }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
